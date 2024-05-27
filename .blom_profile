@@ -1,2 +1,2 @@
 echo "[blom profile]"
-alias commit='git add . && echo "Create a commit message for this git diff:\n$(git diff HEAD)" | sgpt > /tmp/commit_msg && vim /tmp/commit_msg && git commit -m "$(cat /tmp/commit_msg)"'
+alias commit='git add . && echo "Create a commit message for this git diff:\n$(git diff HEAD)" | sgpt > /tmp/commit_msg && vim /tmp/commit_msg && git commit -m "$(cat /tmp/commit_msg)"; [ -f /tmp/commit_msg ] && rm /tmp/commit_msg '
