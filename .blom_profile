@@ -1,0 +1,2 @@
+echo "[blom profile]"
+alias commit='git add . && git commit -m "$(echo "Create a commit message for this git diff:\n$(git diff HEAD)" | sgpt)"'
