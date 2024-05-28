@@ -1,0 +1,6 @@
+shell_gpt
+click
+httpx
+fastapi
+pytest
+pytest-asyncio
