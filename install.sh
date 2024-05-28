@@ -32,6 +32,9 @@ brew install gcc
 log "installing gitlab cli"
 brew install glab
 
+log "installing jq"
+sudo apt-get install jq -y
+
 log "sourcing .bashrc"
 source ~/.bashrc
 

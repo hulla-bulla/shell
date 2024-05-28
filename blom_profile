@@ -2,8 +2,18 @@ echo "[blom profile]"
 
 eval `ssh-agent`
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+#SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 alias commit='git add . && echo "Create a commit message for this git diff:\n$(git diff HEAD)" | sgpt > /tmp/commit_msg && vim /tmp/commit_msg && git commit -m "$(cat /tmp/commit_msg)"; [ -f /tmp/commit_msg ] && rm /tmp/commit_msg '
 alias cm="commit"
 
+
+# gitlab stuffs
+
+function gissues () {
+    if [ -z "$1" ]; then
+        echo "Need group number"
+        return 1
+    fi
+    glab api "/groups/$1/issues" | jq -r '.[] | "###############################################################\n\n\(.web_url)\n\(.title)\n\(.description)\n"'
+}
