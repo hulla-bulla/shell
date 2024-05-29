@@ -9,6 +9,8 @@ alias cm='commit'
 alias cmp='commit && git push'
 alias lg='git log'
 
+alias source-bash=". ~/.bashrc"
+alias sb="source-bash"
 
 # gitlab stuffs
 
