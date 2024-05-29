@@ -4,7 +4,7 @@ eval `ssh-agent`
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-alias commit='git add . && echo "Create a humble, concise, clear, professional commit message in the voice of a senior developer, with bulletpoints unicode bullets • if needed, say something about tests if implemented or relevant but not if no tests are added only if tests are added, for this git diff and give me only the commit message without anything else:\n$(git diff HEAD)" | sgpt > /tmp/commit_msg && vim /tmp/commit_msg && git commit -m "$(cat /tmp/commit_msg)"; [ -f /tmp/commit_msg ] && rm /tmp/commit_msg '
+alias commit='git add . && echo "Create a humble, concise, clear, professional commit message in the voice of a senior developer. The commit message should be with bulletpoints unicode bullets •. Comment about the implemented tests if any. If no tests added then dont comment about tests. When writing back to me, ONLY give me the commit message without anything else. I dont want any greeting or certanly! or similar at the end or beginning of the return message to me. I only want the commit message as I will be copying it straight into a git commit without editing. The commit message should only be based on this git diff: \n$(git diff HEAD)" | sgpt > /tmp/commit_msg && vim /tmp/commit_msg && git commit -m "$(cat /tmp/commit_msg)"; [ -f /tmp/commit_msg ] && rm /tmp/commit_msg '
 alias cm='commit'
 alias cmp='commit && git push'
 alias lg='git log'
