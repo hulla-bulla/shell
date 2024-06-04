@@ -1,28 +1,20 @@
+#!/bin/bash
+
 echo "[blom profile]"
 
 eval `ssh-agent`
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-source $SCRIPT_DIR/_display.sh
+# source $SCRIPT_DIR/_display.sh
+# source $SCRIPT_DIR/_input.sh
 
-
-# general
-ask_to_continue() {
-    while true; do
-        read -p "Do you want to continue? (y/n): " choice
-        case "$choice" in
-            y|Y ) echo "Continuing..."; return 0;;
-            n|N ) echo "Exiting..."; return 1;;
-            * ) echo "Please enter y or n.";;
-        esac
-    done
-}
-
+########################################################################
 # git
 function commit () {
-    commit_temp_path="~/.tmp/commit_msg"
-    mkdir -p $commit_temp_path
+    commit_temp_dir="$HOME/.tmp"
+    commit_temp_path=$commit_temp_dir/commit_msg
+    mkdir -p $commit_temp_dir
    
     git add .
 
@@ -34,21 +26,20 @@ function commit () {
         vim $commit_temp_path
     fi
     
-    print_sep
+    #print_sep
     
     echo "Commit message:"
     cat $commit_temp_path
-    ask_to_continue
+
+    #ask
     
-    print_sep    
+    #print_sep    
     
-    git commit -m "$(cat /tmp/commit_msg)"; 
+    git commit -m "$(cat $commit_temp_path)" 
     
     echo "cleaning up"
     rm $commit_temp_path
     rm $commit_temp_path.swp
-
-
 } 
 
 alias cm='commit'
@@ -58,6 +49,21 @@ alias lg='git log'
 alias source-bash=". ~/.bashrc"
 alias sb="source-bash"
 
+################################################
+# WSL
+
+alias wslfirefox="/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe"
+alias wslfire="wslfirefox"
+alias wfox="wslfirefox"
+
+
+function wslhtmlcov () {
+    url="$(wslpath -w 'htmlcov/index.html' )"
+    wslfirefox $url 
+}
+alias whtml="wslhtmlcov"
+
+########################################################################
 # gitlab
 
 function gissues () {
