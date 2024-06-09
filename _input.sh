@@ -10,4 +10,4 @@ ask_to_continue() {
     done
 }
 
-alias ask="ask_to_continue || { echo "Terminating the script."; exit 1; }"
+alias ask="ask_to_continue"

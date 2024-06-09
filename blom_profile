@@ -6,8 +6,8 @@ eval `ssh-agent`
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-# source $SCRIPT_DIR/_display.sh
-# source $SCRIPT_DIR/_input.sh
+source $SCRIPT_DIR/_display.sh
+source $SCRIPT_DIR/_input.sh
 
 ########################################################################
 # git
@@ -19,28 +19,47 @@ function commit () {
     git add .
 
     #check if anything to commit
-    if [[ -z $(git diff HEAD) ]];then
+    if [[ ! -z $(git diff HEAD) ]];then
         
-        echo "Create a humble, concise, clear, professional commit message in the voice of a senior developer. Write a oneliner what overall happened in the commit. The commit message should be with bulletpoints unicode bullets •, one on each line of course and by this i mean that i want \n between each bullet point as i'm writing this in bash. If the commit changes are very short, skip the bullet points and only do the oneliner.  Comment about the implemented tests if any. If no tests added then dont comment about tests. When writing back to me, ONLY give me the commit message without anything else. I dont want any greeting or certanly! or similar at the end or beginning of the return message to me. I only want the commit message as I will be copying it straight into a git commit without editing. The commit message should only be based on this git diff: \n$(git diff HEAD)" | sgpt > $commit_temp_path
-
+        echo "Create a humble, concise, clear, professional commit message in the \
+voice of a senior developer. Write a oneliner what overall happened in the \
+commit. The commit message should be with bulletpoints unicode bullets •, one \
+on each line of course and by this I mean that I want \n between each bullet \
+point as I'm writing this in bash. If the commit changes are very short, skip \
+the bullet points and only do the oneliner. Comment about the implemented tests \
+if any. If no tests added then don't comment about tests. When writing back to \
+me, ONLY give me the commit message without anything else. I don't want any \
+greeting or certainly! or similar at the end or beginning of the return message \
+to me. I only want the commit message as I will be copying it straight into a git \
+commit without editing. The commit message should only be based on this git diff: \
+\n$(git diff HEAD)" | sgpt > $commit_temp_path
         vim $commit_temp_path
-    fi
-    
-    #print_sep
-    
-    echo "Commit message:"
-    cat $commit_temp_path
+        print_sep
+        echo "If empty, you might need to run sgpt and set the OPENAI_KEY"
+        print_sep
+        
 
-    #ask
+        echo "Commit message:"
+        cat $commit_temp_path
+
+        ask
+        
+        print_sep
+        
+        git commit -m "$(cat $commit_temp_path)" 
+        
+        echo "cleaning up"
+        rm $commit_temp_path
+        rm $commit_temp_path.swp
+    else
+        echo "nothing to commit"
+        return 0
+    fi
+
     
-    #print_sep    
     
-    git commit -m "$(cat $commit_temp_path)" 
-    
-    echo "cleaning up"
-    rm $commit_temp_path
-    rm $commit_temp_path.swp
 } 
+export EDITOR=vim
 
 alias cm='commit'
 alias cmp='commit && git push'
