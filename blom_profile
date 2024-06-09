@@ -9,19 +9,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/_display.sh
 source $SCRIPT_DIR/_input.sh
 
-########################################################################
-# git
-function commit () {
-    commit_temp_dir="$HOME/.tmp"
-    commit_temp_path=$commit_temp_dir/commit_msg
-    mkdir -p $commit_temp_dir
-   
-    git add .
 
-    #check if anything to commit
-    if [[ ! -z $(git diff HEAD) ]];then
-        
-        echo "Create a humble, concise, clear, professional commit message in the \
+BASE_PROMPT="Create a humble, concise, clear, professional commit message in the \
 voice of a senior developer. Write a oneliner what overall happened in the \
 commit. The commit message should be with bulletpoints unicode bullets •, one \
 on each line of course and by this I mean that I want \n between each bullet \
@@ -31,7 +20,25 @@ if any. If no tests added then don't comment about tests. When writing back to \
 me, ONLY give me the commit message without anything else. I don't want any \
 greeting or certainly! or similar at the end or beginning of the return message \
 to me. I only want the commit message as I will be copying it straight into a git \
-commit without editing. The commit message should only be based on this git diff: \
+commit without editing."
+
+########################################################################
+# git
+function _remove_file_if_exist() {
+    [[ -f $1 ]] && rm $1
+}
+
+function commit () {
+    commit_temp_dir="$HOME/.tmp"
+    commit_temp_path=$commit_temp_dir/commit_msg
+    mkdir -p $commit_temp_dir
+   
+    git add .
+
+    #check if anything to commit
+    if [[ ! -z $(git diff HEAD) ]];then
+
+        echo "$BASE_PROMPT The commit message should only be based on this git diff: \
 \n$(git diff HEAD)" | sgpt > $commit_temp_path
         vim $commit_temp_path
         print_sep
@@ -48,17 +55,81 @@ commit without editing. The commit message should only be based on this git diff
         
         git commit -m "$(cat $commit_temp_path)" 
         
-        [[ -f $commit_temp_path ]] && rm $commit_temp_path
-        [[ -f $commit_temp_path.swp ]] && rm $commit_temp_path.swp
+        _remove_file_if_exist $commit_temp_path
+        _remove_file_if_exist $commit_temp_path.swp
+
         echo
     else
         echo "nothing to commit"
         return 0
     fi
-
-    
-    
 } 
+
+function commit_feature () {
+    COMMIT_TEMP_DIR="$HOME/.tmp"
+    COMMIT_TEMP_PATH=$COMMIT_TEMP_DIR/commit_msg
+    mkdir -p $COMMIT_TEMP_DIR
+
+
+    # Check if the branch names are set
+    MAIN_BRANCH=$1
+    FEATURE_BRANCH=$2
+    if [ -z "$MAIN_BRANCH" ] || [ -z "$FEATURE_BRANCH" ]; then
+        echo "Usage: $0 <main-branch> <feature-branch>"
+        exit 1
+    fi
+
+
+    # Fetch the commit messages between the branches
+    COMMIT_MESSAGES=$(git log --oneline "$MAIN_BRANCH".."$FEATURE_BRANCH")
+
+    # Fetch the diff between the branches
+    DIFF=$(git diff "$MAIN_BRANCH".."$FEATURE_BRANCH")
+
+    # Combine the commit messages and the diff
+    PROMPT="$BASE_PROMPT In the top of the message please write something merge feature branch named something into main/master \
+    depending on what the master branch is called. \
+    The commit message should only be based on this git diff and commit messages (if available):\n\
+Commit Messages:\n$COMMIT_MESSAGES\n\n\
+Diff:\n$DIFF\n"
+    
+    # Send the combined information to ChatGPT and get the commit message
+    COMMIT_MESSAGE=$(echo "$PROMPT" | sgpt)
+
+    # Display the commit message
+    echo "Generated Commit Message:"
+    echo "$COMMIT_MESSAGE"
+
+    # Ask the user if they want to use the generated commit message
+    read -p "Do you want to use this commit message? (y/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Create a temporary directory for the commit message
+        COMMIT_TEMP_DIR="$HOME/.tmp"
+        COMMIT_TEMP_PATH="$COMMIT_TEMP_DIR/commit_msg"
+        mkdir -p "$COMMIT_TEMP_DIR"
+        
+        # Save the commit message to a temporary file
+        echo "$COMMIT_MESSAGE" > "$COMMIT_TEMP_PATH"
+
+        # Open the commit message in the default editor
+        ${EDITOR:-vim} "$COMMIT_TEMP_PATH"
+
+        # Perform the merge
+        git merge --squash $FEATURE_BRANCH
+
+        # Commit the changes with the generated message
+        git commit -m "$(cat "$COMMIT_TEMP_PATH")"
+        
+        # Clean up
+        _remove_file_if_exist $commit_temp_path
+        _remove_file_if_exist $commit_temp_path.swp
+    fi
+}
+
+
+
+
 export EDITOR=vim
 
 alias cm='commit'
