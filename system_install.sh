@@ -15,7 +15,7 @@ grep -qxF "source ~/.secrets" ~/.bashrc || echo "source ~/.secrets" >> ~/.bashrc
 chmod 600 ~/.secrets
 
 
-[ -f ~/.secrets ] || (touch ~/.secrets && log "created empty ~/.secrets file")
+[ -f ~/.secrets ] || (cp template.secrets ~/.secrets && log "created empty ~/.secrets file")
 
 log "installing python requirements"
 pip install -r requirements.txt
