@@ -48,9 +48,9 @@ commit without editing. The commit message should only be based on this git diff
         
         git commit -m "$(cat $commit_temp_path)" 
         
-        echo "cleaning up"
         [[ -f $commit_temp_path ]] && rm $commit_temp_path
         [[ -f $commit_temp_path.swp ]] && rm $commit_temp_path.swp
+        echo
     else
         echo "nothing to commit"
         return 0
