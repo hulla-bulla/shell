@@ -1,0 +1,9 @@
+
+
+
+
+function hash_password () {
+    echo -n "$1" | sha256sum | cut -d " " -f1
+}
+
+alias hashpass="hash_password"
