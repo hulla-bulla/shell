@@ -7,3 +7,30 @@ function hash_password () {
 }
 
 alias hashpass="hash_password"
+
+
+function change_id() {
+    echo "change current user to provided id"
+
+    CURRENT_ID=$(id -u)
+    CURRENT_GID=$(id -g)
+    PROVIDED_ID=$1
+    PROVIDED_GID=$2
+    USER_NAME=$(id -u -n)
+    GROUP_NAME=$(id -g -n)
+
+    echo "Changing for current user $USER_NAME and group $GROUP_NAME"
+    echo "Change id $CURRENT_ID -> $PROVIDED_ID"
+    echo "Change gid $CURRENT_GID -> $PROVIDED_GID"
+
+    echo "usermod -u $PROVIDED_ID $USER_NAME"
+    echo "usermod -g $PROVIDED_ID $GROUP_NAME"
+
+    #grep $USER_NAME /etc/passwd # search for 'foo' in the group file #
+    #grep $GROUP_NAME /etc/group # use the find command to locate files 
+
+    echo "find / -group $CURRENT_ID -exec chgrp -h $USER_NAME {} \;"
+    echo "find / -user $CURRENT_GID -exec chown -h $GROUP_NAME {} \;"
+    echo ""
+    echo "Double check /etc/passwd and /etc/group and /etc/shadow for id and gid"
+}
